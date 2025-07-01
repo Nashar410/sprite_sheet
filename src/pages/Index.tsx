@@ -9,6 +9,8 @@ import { useCamera } from "@/hooks/useCamera";
 import { useAnimation } from "@/hooks/useAnimation";
 import { useExport } from "@/hooks/useExport";
 import { useImageEffects } from "@/hooks/useImageEffects";
+import { SafeCalibrationPanel } from "@/components/SafeCalibrationPanel";
+import { useSafeModelCalibration } from "@/hooks/useSafeModelCalibration";
 
 const Index = () => {
   const [showGrid, setShowGrid] = useState(false);
@@ -110,12 +112,28 @@ const Index = () => {
       setStatus("Ready - Import a GLB model to begin");
     }
   }, [isLoading, loadingProgress, model, modelError]);
+const calibrationHook = useSafeModelCalibration();
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden bg-background">
       <StatusBar status={status} />
       
       <div className="flex-1 flex overflow-hidden">
+          {/* Panneau de calibration en haut */}
+  <div className="p-3">
+    <SafeCalibrationPanel
+      calibration={calibrationHook.calibration}
+      isCalibrating={calibrationHook.isCalibrating}
+      hasModel={!!model}
+      modelName={model?.name}
+      onManualCalibrate={() => calibrationHook.manualCalibrate(model)}
+      onSetFrontFace={calibrationHook.setFrontFace}
+      onRotateToAngle={calibrationHook.rotateToAngle}
+      onSaveProfile={calibrationHook.saveProfile}
+      onLoadProfile={calibrationHook.loadProfile}
+      availableProfiles={calibrationHook.getProfiles()}
+    />
+  </div>
         <LeftPanel
           showGrid={showGrid} 
           setShowGrid={setShowGrid}
