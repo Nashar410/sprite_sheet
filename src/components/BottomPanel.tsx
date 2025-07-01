@@ -31,6 +31,13 @@ const BottomPanel = ({
   hasAnimations,
   setCurrentFrame
 }: BottomPanelProps) => {
+  
+  // FIX: Ajouter une fonction pour gérer le changement d'animation
+  const handleAnimationChange = (newAnimation: string) => {
+    console.log(`BottomPanel: Changing animation from "${currentAnimation}" to "${newAnimation}"`);
+    setCurrentAnimation(newAnimation);
+  };
+
   return (
     <div className={`h-24 p-4 panel mx-3 mb-3 ${hasAnimations ? 'animate-fade-in' : 'opacity-70'}`}>
       <div className="flex items-center space-x-4 h-full">
@@ -38,7 +45,7 @@ const BottomPanel = ({
           <Label htmlFor="animation-select" className="panel-label">Animation</Label>
           <Select
             value={currentAnimation || ""}
-            onValueChange={setCurrentAnimation}
+            onValueChange={handleAnimationChange}
             disabled={!hasAnimations}
           >
             <SelectTrigger id="animation-select">
@@ -94,7 +101,7 @@ const BottomPanel = ({
           <div className="flex justify-between items-center">
             <span className="panel-label">Frame</span>
             <span className="text-xs font-medium">
-              {hasAnimations ? `${currentFrame} / ${totalFrames}` : "No Frames"}
+              {hasAnimations ? `${currentFrame + 1} / ${totalFrames}` : "No Frames"}
             </span>
           </div>
           <Slider
@@ -110,6 +117,13 @@ const BottomPanel = ({
             }}
             disabled={isPlaying || totalFrames === 0 || !hasAnimations}
           />
+          
+          {/* FIX: Ajouter des informations de debug en développement */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-xs text-muted-foreground">
+              Animation: {currentAnimation || 'None'} | Total frames: {totalFrames}
+            </div>
+          )}
         </div>
       </div>
     </div>

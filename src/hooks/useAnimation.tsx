@@ -25,19 +25,30 @@ export const useAnimation = (model: any) => {
     if (animNames.length > 0 && !currentAnimation) {
       setCurrentAnimation(animNames[0]);
     }
-    
-    // Set total frames based on first animation
-    if (model.animations.length > 0) {
-      const firstAnim = model.animations[0];
-      const fps = 30; // Assume 30 fps
-      const frames = Math.floor(firstAnim.duration * fps);
-      setTotalFrames(frames);
+  }, [model]);
+
+  // FIX: Mettre à jour totalFrames quand currentAnimation change
+  useEffect(() => {
+    if (!model || !model.animations || !currentAnimation) {
+      setTotalFrames(0);
+      setCurrentFrame(0);
+      return;
     }
-  }, [model, currentAnimation]);
+    
+    // Trouver l'animation sélectionnée
+    const selectedAnim = model.animations.find((anim: any) => anim.name === currentAnimation);
+    if (selectedAnim) {
+      const fps = 30; // Assume 30 fps
+      const frames = Math.floor(selectedAnim.duration * fps);
+      console.log(`Animation "${currentAnimation}" - Duration: ${selectedAnim.duration}s, Frames: ${frames}`);
+      setTotalFrames(frames);
+      setCurrentFrame(0); // Reset à la première frame quand on change d'animation
+    }
+  }, [model, currentAnimation]); // Dépendances importantes: model ET currentAnimation
   
   // Handle animation playback
   useEffect(() => {
-    if (!isPlaying || !model || !model.animations || !currentAnimation) {
+    if (!isPlaying || !model || !model.animations || !currentAnimation || totalFrames === 0) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -49,7 +60,6 @@ export const useAnimation = (model: any) => {
     const anim = model.animations.find((a: any) => a.name === currentAnimation);
     if (!anim) return;
     
-    const animationDuration = anim.duration;
     const frameTime = 1000 / fps; // Time per frame in ms
     
     const updateFrame = (timestamp: number) => {
@@ -99,28 +109,12 @@ export const useAnimation = (model: any) => {
     });
   }, [totalFrames]);
   
+  // FIX: Simplifier la fonction setAnimation
   const setAnimation = useCallback((animation: string) => {
+    console.log(`Changing animation to: ${animation}`);
     setCurrentAnimation(animation);
-    setCurrentFrame(0);
-    
-    // Find the animation in the model to get its duration
-    if (model && model.animations) {
-      const anim = model.animations.find((a: any) => a.name === animation);
-      if (anim) {
-        const fps = 30; // Assume 30 fps
-        const frames = Math.floor(anim.duration * fps);
-        setTotalFrames(frames);
-      }
-    }
-      if (!model || !model.animations || !currentAnimation) return;
-  
-  const anim = model.animations.find((a: any) => a.name === currentAnimation);
-  if (anim) {
-    const fps = 30; // Assume 30 fps
-    const frames = Math.floor(anim.duration * fps);
-    setTotalFrames(frames);
-  }
-}, [model, currentAnimation]);
+    // Le useEffect se chargera de mettre à jour totalFrames et currentFrame
+  }, []);
   
   return {
     isPlaying,

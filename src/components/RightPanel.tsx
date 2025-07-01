@@ -189,6 +189,7 @@ const RightPanel = ({
               </div>
             </div>
 
+
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="render-steps">Render Steps</Label>
@@ -203,9 +204,10 @@ const RightPanel = ({
                 step={1}
               />
               {totalFrames > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Will export ~{Math.ceil(totalFrames / renderSteps)} frames
-                </p>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Will export ~{Math.ceil(totalFrames / renderSteps)} frames</p>
+                  <p>Animation: {currentAnimation || 'None'} ({totalFrames} frames)</p>
+                </div>
               )}
             </div>
 
